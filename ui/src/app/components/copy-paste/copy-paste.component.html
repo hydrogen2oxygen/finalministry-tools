@@ -1,0 +1,5 @@
+
+<form [formGroup]="copyPasteForm" class="mb-3">
+  <label for="text" class="form-label">Paste your text here</label>
+  <textarea class="form-control" id="text" rows="10" style="width: 95%" (keyup)="cleanText()" formControlName="text"></textarea>
+</form>
