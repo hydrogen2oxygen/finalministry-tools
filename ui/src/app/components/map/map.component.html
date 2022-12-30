@@ -1,0 +1,16 @@
+<div id="map" style="top: 0px; left:0px;width: 100%; height: 100%; position:fixed; background-color: #125699"></div>
+<div style="position: fixed; top:10px; left: 10px;">
+  <a class="btn btn-sm btn-primary toolbar-button" [routerLink]="['/DASHBOARD']" title="BACK TO HOME"><i class="bi bi-house-fill"></i></a>
+  <button class="btn btn-sm btn-info toolbar-button" (click)="setHomeCoordinates()" title="SET HOME XY"><i class="bi bi-x-square"></i></button>
+  <button class="btn btn-sm btn-primary toolbar-button" (click)="drawPolygon()" title="DRAW A POLYGON OR MAP"><i class="bi bi-pencil-square"></i></button>
+  <button *ngIf="modeSelected != 'edit'" class="btn btn-sm btn-warning toolbar-button" (click)="editFeature()" title="EDIT AN EXISTING MAP"><i class="bi bi-pencil-fill"></i></button>
+  <button class="btn btn-sm btn-info toolbar-button" (click)="setNavigateMode()" title="NAVIGATION MODE (NO EDIT)"><i class="bi bi-eye"></i></button>
+  <button *ngIf="featureModified && territoryNumberSet()" class="btn btn-sm btn-warning toolbar-button" (click)="saveMap()">SAVE MODIFICATION!</button>
+  <button *ngIf="featureModified && !territoryNumberSet()" class="btn btn-sm btn-warning toolbar-button" disabled>SAVE MODIFICATION!</button>
+  <button *ngIf="!hideImportedFeature" (click)="hideImportedFeature = !hideImportedFeature; vectorLayer.getSource().changed();" class="btn btn-sm btn-info toolbar-button" title="hide outline polygon"><i class="bi bi-easel-fill"></i></button>
+  <button *ngIf="hideImportedFeature" (click)="hideImportedFeature = !hideImportedFeature; vectorLayer.getSource().changed();" class="btn btn-sm btn-primary toolbar-button" title="show outline polygon"><i class="bi bi-easel2"></i></button>
+  <button *ngIf="!showOsmData" (click)="showOsmData = !showOsmData; vectorLayer.getSource().changed();" class="btn btn-sm btn-success toolbar-button" title="show OsmData"><i class="bi bi-easel-fill"></i></button>
+  <button *ngIf="showOsmData" (click)="showOsmData = !showOsmData; vectorLayer.getSource().changed();" class="btn btn-sm btn-primary toolbar-button" title="hide OsmData"><i class="bi bi-easel2"></i></button>
+  <button class="btn btn-sm btn-danger toolbar-button" (click)="deleteMap()" title="DELETE MAP"><i class="bi bi-trash3-fill"></i></button>
+</div>
+<button class="btn btn-sm btn-primary btn-bottom" style="position: fixed; bottom: 1rem; right: 1rem" (click)="switchButtons()">...</button>
