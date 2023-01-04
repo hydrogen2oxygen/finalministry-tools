@@ -22,6 +22,8 @@ import VectorImageLayer from "ol/layer/VectorImage";
 import {Type} from "ol/geom/Geometry";
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {MapDesignService} from "../../services/map-design.service";
+import {LocalStorageDB, MapEntry} from "../../domains/LocalStorageDB";
+import {LocalStorageService} from "../../services/local-storage.service";
 
 @Component({
   selector: 'app-map',
@@ -30,10 +32,11 @@ import {MapDesignService} from "../../services/map-design.service";
 })
 export class MapComponent implements OnInit {
 
-  uuid:string|undefined;
+  uuid: string | undefined;
+  localStorageDB: LocalStorageDB = new LocalStorageDB();
   map: olMap | null = null;
   view: View = new View();
-  vectorLayer:VectorLayer<any>=new VectorLayer<any>();
+  vectorLayer: VectorLayer<any> = new VectorLayer<any>();
   coordinateX = new FormControl(48.6974947);
   coordinateY = new FormControl(9.1506559);
   source = new VectorSource();
@@ -42,8 +45,8 @@ export class MapComponent implements OnInit {
   lastSelectedTerritoryMap: TerritoryMap | undefined = undefined;
   lastSavedTerritoryName: string = '';
   importedFeature: Feature | undefined = undefined;
-  hideImportedFeature:boolean = true;
-  showOsmData:boolean = false;
+  hideImportedFeature: boolean = true;
+  showOsmData: boolean = false;
 
   styleRedOutline: Style = new Style({
     fill: new Fill({
@@ -155,10 +158,14 @@ export class MapComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private mapDesignService: MapDesignService,
     private formBuilder: FormBuilder,
+    private localStorageService:LocalStorageService
   ) {
   }
 
   ngOnInit(): void {
+
+    this.localStorageDB = this.localStorageService.loadUuidInsideLocalStorage();
+    this.mapDesign.lastModification = new Date();
 
     this.activatedRoute.queryParams.subscribe(params => {
       this.uuid = params['id'];
@@ -166,7 +173,7 @@ export class MapComponent implements OnInit {
 
     if (!this.uuid) {
       this.uuid = crypto.randomUUID();
-      const queryParams: Params = { id: this.uuid };
+      const queryParams: Params = {id: this.uuid};
 
       this.router.navigate(
         [],
@@ -192,7 +199,8 @@ export class MapComponent implements OnInit {
 
         if (!that.showOsmData && feature.get('residentialUnit')) {
           style = new Style({});
-        } if (that.showOsmData && feature.get('residentialUnit')) {
+        }
+        if (that.showOsmData && feature.get('residentialUnit')) {
           style = that.styleBlueOutlineActive;
         } else if (feature.get('imported') && !that.hideImportedFeature) {
           style = that.styleImported;
@@ -296,13 +304,13 @@ export class MapComponent implements OnInit {
     }
 
     this.mapDesignService.loadMapDesign(this.uuid).subscribe((mapDesign: MapDesign) => {
-      console.log(mapDesign)
-      this.loadMapDesignObject(mapDesign);
-      if (centerView) {
-        this.map?.getView().setCenter([this.mapDesign.coordinatesX, this.mapDesign.coordinatesY]);
-        this.map?.getView().setZoom(this.mapDesign.zoom);
-      }
-    },
+        console.log(mapDesign)
+        this.loadMapDesignObject(mapDesign);
+        if (centerView) {
+          this.map?.getView().setCenter([this.mapDesign.coordinatesX, this.mapDesign.coordinatesY]);
+          this.map?.getView().setZoom(this.mapDesign.zoom);
+        }
+      },
       error => {
         if (error.status == 404) {
           console.log("No file found yet!")
@@ -389,6 +397,8 @@ export class MapComponent implements OnInit {
     this.mapDesignService.saveMapDesign(this.uuid, this.mapDesign).subscribe(() => {
       this.territoryNumber.setValue('');
       this.loadMap();
+      // @ts-ignore
+      this.localStorageDB = this.localStorageService.saveUuidInsideLocalStorage(this.uuid);
     })
   }
 
@@ -485,10 +495,13 @@ export class MapComponent implements OnInit {
       territoryMap.simpleFeatureData = data;
 
       this.mapDesign.territoryMapList.push(territoryMap);
+      this.mapDesign.lastModification = new Date();
 
       // @ts-ignore
-      this.mapDesignService.saveMapDesign(this.uuid, this.mapDesign).subscribe((note:string) => {
-        console.log(note)
+      this.mapDesignService.saveMapDesign(this.uuid, this.mapDesign).subscribe((note: string) => {
+        this.toastr.success("Territory map saved!");
+        // @ts-ignore
+        this.localStorageDB = this.localStorageService.saveUuidInsideLocalStorage(this.uuid);
       });
 
     });
@@ -497,7 +510,7 @@ export class MapComponent implements OnInit {
     this.modeSelected = 'navigate';
   }
 
-  private removeInteraction() {
+  removeInteraction() {
     this.map?.removeInteraction(this.interaction);
     this.interaction = null;
   }
@@ -517,6 +530,8 @@ export class MapComponent implements OnInit {
       console.log(this.mapDesign)
       // @ts-ignore
       this.mapDesignService.saveMapDesign(this.uuid, this.mapDesign).subscribe(() => {
+        // @ts-ignore
+        this.localStorageDB = this.localStorageService.saveUuidInsideLocalStorage(this.uuid);
         this.loadMap();
         this.toastr.info("New center was set!", "Map Service")
       })
@@ -535,11 +550,16 @@ export class MapComponent implements OnInit {
       this.mapDesign.territoryMapList.splice(index)
     }
 
-    if (this.lastSelectedFeature) this.source.removeFeature(this.lastSelectedFeature);
+    if (this.lastSelectedFeature) {
+      this.source.removeFeature(this.lastSelectedFeature);
+    }
+
+    this.mapDesign.lastModification = new Date();
 
     // @ts-ignore
     this.mapDesignService.saveMapDesign(this.uuid, this.mapDesign).subscribe(() => {
-
+      // @ts-ignore
+      this.localStorageDB = this.localStorageService.saveUuidInsideLocalStorage(this.uuid);
       //this.loadMapDesignObject(mapDesign)
     });
   }
@@ -547,7 +567,7 @@ export class MapComponent implements OnInit {
   exportKml() {
 
     let format = new KML({
-      'extractStyles':false
+      'extractStyles': false
     });
     let kmlStyle = "<Document><Style id=\"failed\"><LineStyle><color>bfff55aa</color>" +
       "\t\t\t<width>2</width>\n" +
@@ -577,7 +597,7 @@ export class MapComponent implements OnInit {
       "\t</StyleMap>";
     let kml = format.writeFeatures(this.source.getFeatures(), {featureProjection: 'EPSG:3857'});
     kml = kml.replace("<Document>", kmlStyle);
-    kml = kml.replaceAll("<name>","<styleUrl>#failed1</styleUrl><name>");
+    kml = kml.replaceAll("<name>", "<styleUrl>#failed1</styleUrl><name>");
 
     let binaryData = [];
     binaryData.push(kml);
@@ -621,7 +641,10 @@ export class MapComponent implements OnInit {
     }
   }
 
-  navigateToTerritoryMap(number: any) {
+  navigateToTerritoryMap(number
+                           :
+                           any
+  ) {
     let feature: Feature<Geometry> | null = this.source.getFeatureById(number);
     if (feature != undefined && feature.getGeometry() != undefined) {
       // @ts-ignore
@@ -637,9 +660,12 @@ export class MapComponent implements OnInit {
     return false;
   }
 
-  getCenterOfExtent(extent:Extent){
-    var X = extent[0] + (extent[2]-extent[0])/2;
-    var Y = extent[1] + (extent[3]-extent[1])/2;
+  getCenterOfExtent(extent
+                      :
+                      Extent
+  ) {
+    var X = extent[0] + (extent[2] - extent[0]) / 2;
+    var Y = extent[1] + (extent[3] - extent[1]) / 2;
     return [X, Y];
   }
 

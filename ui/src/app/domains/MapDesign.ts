@@ -5,6 +5,7 @@ export class MapDesign {
   coordinatesY:number = 7530279;
   zoom:number = 12;
   territoryMapList:TerritoryMap[] = [];
+  lastModification:Date|undefined;
 }
 
 export class TerritoryMap {
