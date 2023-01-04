@@ -1,18 +1,26 @@
-<form [formGroup]="whatsappText" class="mb-3">
-  <label for="text" class="form-label">Let's write a whatsapp status ...</label>
-  <textarea class="form-control" id="text" rows="10" style="width: 95%" (keyup)="actualizeText()"
-            formControlName="text"></textarea>
-</form>
-
 <div class="whatsappStatus">
-    <a *ngFor="let element of whatsappStatus.elements" (click)="elementClick(element)">
-      <h1 *ngIf="element.type == 1" style="{{element.getStyle()}}">{{element.text}}</h1>
-      <p *ngIf="element.type == 2" style="{{element.getStyle()}}">{{element.text}}</p>
-    </a>
+  <a *ngFor="let element of whatsappStatus.elements" (click)="elementClick(element)">
+    <p style="{{element.getStyle()}}">{{element.text}}</p>
+  </a>
 
   <div *ngIf="selectedElement">
+    <form [formGroup]="whatsappText" class="mb-3">
+      <label for="text" class="form-label">Text of the selected element:</label>
+      <textarea class="form-control" id="text" rows="3" style="width: 95%" formControlName="text"
+                (keyup)="actualizeText()"></textarea>
+    </form>
     <input [(colorPicker)]="selectedElement.bgcolor" [style.background]="selectedElement.bgcolor"/>
+    <input [(colorPicker)]="selectedElement.color" [style.background]="selectedElement.color"/>
+    <div style="overflow-y: scroll; height:200px;">
+      <button *ngFor="let font of availableFonts" style="font-family: {{font}}"
+              (click)="selectFont(font)">{{font}}</button>
+    </div>
+    <button class="btn btn-sm btn-primary" (click)="closeEditMode()">Close</button>
   </div>
+</div>
+
+<div style="margin-top: 1rem">
+  <button class="btn btn-sm btn-primary" (click)="addElement()">ADD</button>
 </div>
 
 

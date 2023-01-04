@@ -1,7 +1,8 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {FormBuilder} from "@angular/forms";
 import {ToastrService} from "ngx-toastr";
 import {WhatsappElement, WhatsappStatus} from "../../domains/WhatsappStatus";
+import {FontsChecker} from "../../utilities/FontsChecker";
 
 @Component({
   selector: 'app-whatsapp-status',
@@ -16,6 +17,7 @@ export class WhatsappStatusComponent implements OnInit {
   });
   color: any;
   selectedElement: WhatsappElement|undefined;
+  availableFonts:string[] = [];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -24,19 +26,31 @@ export class WhatsappStatusComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.whatsappText.get('text')?.setValue('*HI!*\n' +
-      '---\n' +
-      'This is a test');
-    this.actualizeText()
-  }
 
-  actualizeText() {
-    // @ts-ignore
-    this.whatsappStatus.rawText = this.whatsappText.get('text').value;
-    this.whatsappStatus.transformRawTextToElements();
+    let fontsChecker:FontsChecker = new FontsChecker();
+    this.availableFonts = fontsChecker.availableFonts();
   }
 
   elementClick(element: WhatsappElement) {
     this.selectedElement = element;
+    this.whatsappText.get('text')?.setValue(element.text);
+  }
+
+  closeEditMode() {
+    this.selectedElement = undefined;
+  }
+
+  selectFont(font: string) {
+    // @ts-ignore
+    this.selectedElement.font = font;
+  }
+
+  addElement() {
+    this.whatsappStatus.addElement("TEXT")
+  }
+
+  actualizeText() {
+    // @ts-ignore
+    this.selectedElement.text = this.whatsappText.get('text')?.value;
   }
 }
