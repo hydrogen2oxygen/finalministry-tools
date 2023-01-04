@@ -11,13 +11,16 @@ import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {HashLocationStrategy, LocationStrategy} from "@angular/common";
 import { MapComponent } from './components/map/map.component';
 import {HttpClientModule} from "@angular/common/http";
+import { WhatsappStatusComponent } from './components/whatsapp-status/whatsapp-status.component';
+import {ColorPickerModule} from "ngx-color-picker";
 
 @NgModule({
   declarations: [
     AppComponent,
     DashboardComponent,
     CopyPasteComponent,
-    MapComponent
+    MapComponent,
+    WhatsappStatusComponent
   ],
   imports: [
     BrowserModule,
@@ -25,7 +28,8 @@ import {HttpClientModule} from "@angular/common/http";
     ReactiveFormsModule,
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
-    HttpClientModule
+    HttpClientModule,
+    ColorPickerModule
   ],
   providers: [{provide: LocationStrategy, useClass: HashLocationStrategy}],
   bootstrap: [AppComponent]
