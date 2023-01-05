@@ -19,3 +19,8 @@
   </div>
 </div>
 
+<div *ngIf="localStorageDB.mapEntries.length > 0">
+  <hr>
+  <h3>Territories</h3>
+  <button class="btn btn-sm btn-primary" style="margin: 0.3rem" *ngFor="let map of localStorageDB.mapEntries" (click)="navigateToTerritory(map.uuid)">{{map.name}} {{map.lastModification | date:'dd-MM-yy'}}</button>
+</div>

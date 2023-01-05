@@ -4,5 +4,6 @@ export class LocalStorageDB {
 
 export class MapEntry {
   uuid:string|undefined;
+  name:string|undefined;
   lastModification:Date = new Date();
 }

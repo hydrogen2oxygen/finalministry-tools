@@ -22,7 +22,7 @@ export class LocalStorageService {
     return this.localStorageDB;
   }
 
-  saveUuidInsideLocalStorage(uuid:string):LocalStorageDB {
+  saveUuidInsideLocalStorage(uuid:string, name:string|undefined):LocalStorageDB {
 
     let localStorageJsonText = localStorage.getItem("db");
 
@@ -35,9 +35,11 @@ export class LocalStorageService {
         let newMapEntry = new MapEntry();
         newMapEntry.uuid = uuid;
         newMapEntry.lastModification = new Date();
+        newMapEntry.name = name;
         this.localStorageDB.mapEntries.push(newMapEntry);
       } else {
         mapEntry.lastModification = new Date();
+        mapEntry.name = name;
         this.localStorageDB.mapEntries[this.localStorageDB.mapEntries.findIndex(e => e.uuid == uuid)] = mapEntry;
       }
 
@@ -46,6 +48,7 @@ export class LocalStorageService {
       let localStorageDB = new LocalStorageDB();
       let newMapEntry = new MapEntry();
       newMapEntry.uuid = uuid;
+      newMapEntry.name = name;
       newMapEntry.lastModification = new Date();
       localStorageDB.mapEntries.push(newMapEntry);
       localStorage.setItem("db", JSON.stringify(localStorageDB));

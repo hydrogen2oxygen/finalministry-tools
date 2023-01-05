@@ -47,6 +47,7 @@ export class MapComponent implements OnInit {
   importedFeature: Feature | undefined = undefined;
   hideImportedFeature: boolean = true;
   showOsmData: boolean = false;
+  showAdditionalButtons:boolean = false;
 
   styleRedOutline: Style = new Style({
     fill: new Fill({
@@ -138,6 +139,7 @@ export class MapComponent implements OnInit {
 
   mapDesign: MapDesign = new MapDesign();
   note = new FormControl('');
+  name = new FormControl('');
   territoryNumber = new FormControl('');
   territoryCustomNumber = new FormControl('');
   territoryCustomName = new FormControl('');
@@ -323,6 +325,9 @@ export class MapComponent implements OnInit {
   loadMapDesignObject(mapDesign: MapDesign) {
     this.mapDesign = mapDesign;
 
+    // @ts-ignore
+    this.name.setValue(this.mapDesign.name);
+
     let format = new WKT();
 
     mapDesign.territoryMapList.forEach(territoryMap => {
@@ -351,9 +356,9 @@ export class MapComponent implements OnInit {
       return;
     }
 
-    if (!this.territoryCustomNumber.value) {
-      this.toastr.warning("Territory Number is missing!");
-      return;
+    if (this.name.getRawValue()) {
+      // @ts-ignore
+      this.mapDesign.name = this.name.getRawValue();
     }
 
     if (this.territoryNumber.value?.length == 0) {
@@ -398,7 +403,7 @@ export class MapComponent implements OnInit {
       this.territoryNumber.setValue('');
       this.loadMap();
       // @ts-ignore
-      this.localStorageDB = this.localStorageService.saveUuidInsideLocalStorage(this.uuid);
+      this.localStorageDB = this.localStorageService.saveUuidInsideLocalStorage(this.uuid, this.mapDesign.name);
     })
   }
 
@@ -501,7 +506,7 @@ export class MapComponent implements OnInit {
       this.mapDesignService.saveMapDesign(this.uuid, this.mapDesign).subscribe((note: string) => {
         this.toastr.success("Territory map saved!");
         // @ts-ignore
-        this.localStorageDB = this.localStorageService.saveUuidInsideLocalStorage(this.uuid);
+        this.localStorageDB = this.localStorageService.saveUuidInsideLocalStorage(this.uuid, this.mapDesign.name);
       });
 
     });
@@ -531,7 +536,7 @@ export class MapComponent implements OnInit {
       // @ts-ignore
       this.mapDesignService.saveMapDesign(this.uuid, this.mapDesign).subscribe(() => {
         // @ts-ignore
-        this.localStorageDB = this.localStorageService.saveUuidInsideLocalStorage(this.uuid);
+        this.localStorageDB = this.localStorageService.saveUuidInsideLocalStorage(this.uuid, this.mapDesign.name);
         this.loadMap();
         this.toastr.info("New center was set!", "Map Service")
       })
@@ -559,7 +564,7 @@ export class MapComponent implements OnInit {
     // @ts-ignore
     this.mapDesignService.saveMapDesign(this.uuid, this.mapDesign).subscribe(() => {
       // @ts-ignore
-      this.localStorageDB = this.localStorageService.saveUuidInsideLocalStorage(this.uuid);
+      this.localStorageDB = this.localStorageService.saveUuidInsideLocalStorage(this.uuid, this.mapDesign.name);
       //this.loadMapDesignObject(mapDesign)
     });
   }
@@ -670,6 +675,6 @@ export class MapComponent implements OnInit {
   }
 
   switchButtons() {
-
+    this.showAdditionalButtons = !this.showAdditionalButtons;
   }
 }

@@ -5,8 +5,7 @@
   <button class="btn btn-sm btn-primary toolbar-button" (click)="drawPolygon()" title="DRAW A POLYGON OR MAP"><i class="bi bi-pencil-square"></i></button>
   <button *ngIf="modeSelected != 'edit'" class="btn btn-sm btn-warning toolbar-button" (click)="editFeature()" title="EDIT AN EXISTING MAP"><i class="bi bi-pencil-fill"></i></button>
   <button class="btn btn-sm btn-info toolbar-button" (click)="setNavigateMode()" title="NAVIGATION MODE (NO EDIT)"><i class="bi bi-eye"></i></button>
-  <button *ngIf="featureModified && territoryNumberSet()" class="btn btn-sm btn-warning toolbar-button" (click)="saveMap()">SAVE MODIFICATION!</button>
-  <button *ngIf="featureModified && !territoryNumberSet()" class="btn btn-sm btn-warning toolbar-button" disabled>SAVE MODIFICATION!</button>
+  <button *ngIf="featureModified" class="btn btn-sm btn-warning toolbar-button" (click)="saveMap()">SAVE MODIFICATION!</button>
   <button *ngIf="!hideImportedFeature" (click)="hideImportedFeature = !hideImportedFeature; vectorLayer.getSource().changed();" class="btn btn-sm btn-info toolbar-button" title="hide outline polygon"><i class="bi bi-easel-fill"></i></button>
   <button *ngIf="hideImportedFeature" (click)="hideImportedFeature = !hideImportedFeature; vectorLayer.getSource().changed();" class="btn btn-sm btn-primary toolbar-button" title="show outline polygon"><i class="bi bi-easel2"></i></button>
   <button *ngIf="!showOsmData" (click)="showOsmData = !showOsmData; vectorLayer.getSource().changed();" class="btn btn-sm btn-success toolbar-button" title="show OsmData"><i class="bi bi-easel-fill"></i></button>
@@ -14,3 +13,6 @@
   <button class="btn btn-sm btn-danger toolbar-button" (click)="deleteMap()" title="DELETE MAP"><i class="bi bi-trash3-fill"></i></button>
 </div>
 <button class="btn btn-sm btn-primary btn-bottom" style="position: fixed; bottom: 1rem; right: 1rem" (click)="switchButtons()">...</button>
+<div style="position: fixed; bottom:10px; left: 10px;">
+  <input class="form-control form-control-sm" type="text" placeholder="map name" [formControl]="name" (ngModelChange)="modeSelected = 'edit'; featureModified = true">
+</div>
